@@ -14,8 +14,6 @@
   onMount(fetchImages);
 </script>
 
-<h1>Image List</h1>
-
 <ul>
   {#each all_images as image}
     <li>

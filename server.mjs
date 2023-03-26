@@ -16,6 +16,11 @@ app.use(cors({
 // app.use(express.static('dist/client/'));
 // app.use(ssrHandler);
 
+const CACHE_DIR = path.join('.', "cache");
+
+if (!fs.existsSync(CACHE_DIR)) {
+  fs.mkdirSync(CACHE_DIR);
+}
 
 
 let imageMetadata;
@@ -67,6 +72,17 @@ app.get("/image/:hash", async (req, res) => {
     return res.status(404).send("File not found");
   }
 
+  const cacheKey = `${hash}_${width || ""}_${height || ""}_${quality || ""}`;
+
+  const cachedImage = path.join(CACHE_DIR, cacheKey)
+  if (fs.existsSync(cachedImage)) {
+    const image = fs.readFileSync(cachedImage);
+    res.writeHead(200, { "Content-Type": "image/jpeg" });
+    res.end(image);
+    // console.log('cache hit')
+    return;
+  }
+
   let image = fs.readFileSync(imageInfo.path);
 
   let parsedQuality = 50;
@@ -95,10 +111,12 @@ app.get("/image/:hash", async (req, res) => {
 
   if (parsedWidth !== null || parsedHeight !== null) {
     let transform = sharp(image);
-    transform = transform.resize(parsedWidth, parsedHeight);
+    transform = transform.resize(parsedWidth, parsedHeight).withMetadata();
     image = await transform
     .jpeg({ quality: parsedQuality, progressive: true, chromaSubsampling: '4:4:4' }) // compress the image as JPEG with quality 80%
     .toBuffer();
+
+    fs.writeFileSync(cachedImage, image);
   }
 
   res.writeHead(200, { "Content-Type": "image/jpeg" });
