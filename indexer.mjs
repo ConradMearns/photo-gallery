@@ -23,6 +23,11 @@ async function collectImageFiles(directory) {
   return files;
 }
 
+async function getDominantColor(file) {
+  const color = await dominantColor(file);
+  return { red: color[0], green: color[1], blue: color[2] };
+}
+
 // check if a file is an image file
 function isImage(file) {
   const imageExtensions = [".jpg", ".jpeg", ".png", ".gif", ".webp"];
@@ -43,7 +48,10 @@ function getFileHash(file) {
   });
 }
 
-
+async function getImageSize(file) {
+  const metadata = await sharp(file).metadata();
+  return { width: metadata.width, height: metadata.height };
+}
 
 export async function indexImages(directory) {
     // recursively collect image files
@@ -55,12 +63,17 @@ export async function indexImages(directory) {
         const hash = await getFileHash(file);
         const fileStat = fs.statSync(file);
         const createdAt = fileStat.birthtime;
+        const size = await getImageSize(file);
+        const dominantColor = await getDominantColor(file);
   
         return {
           path: file,
           size: fileStat.size,
           createdAt,
           hash,
+          width: size.width,
+          height: size.height,
+          dominant_color: dominantColor,
         };
       })
     );
