@@ -141,10 +141,10 @@ app.get("/image/:hash", async (req, res) => {
 
 export function startServer() {
   console.log("Starting Astro");
-  app.use(express.static("dist/client/"));
-  app.use(ssrHandler);
-
-  app.listen(port, () => {
-    console.log(`Server listening on port ${port}`);
-  });
 }
+app.use(express.static("dist/client/"));
+app.use(ssrHandler);
+
+app.listen(port, () => {
+  console.log(`Server listening on port ${port}`);
+});
