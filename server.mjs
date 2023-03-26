@@ -3,7 +3,7 @@ import path from "path";
 import * as fs from "fs";
 import cors from "cors";
 import sharp from "sharp";
-// import { handler as ssrHandler } from "./dist/server/entry.mjs";
+import { handler as ssrHandler } from "./dist/server/entry.mjs";
 
 const app = express();
 const port = process.env.PORT || 3001;
