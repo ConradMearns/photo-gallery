@@ -9,7 +9,7 @@ const app = express();
 const port = process.env.PORT || 3001;
 
 app.use(cors({
-  origin: 'http://localhost:3000',
+  origin: 'http://192.168.15:3001',
 }));
 
 import { handler as ssrHandler } from './dist/server/entry.mjs';
