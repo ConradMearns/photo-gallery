@@ -25,7 +25,7 @@ async function collectImageFiles(directory) {
 
 // check if a file is an image file
 function isImage(file) {
-  const imageExtensions = [".jpg", ".jpeg", ".png", ".gif", ".svg", ".webp"];
+  const imageExtensions = [".jpg", ".jpeg", ".png", ".gif", ".webp"];
   const ext = path.extname(file).toLowerCase();
 
   return imageExtensions.includes(ext);
