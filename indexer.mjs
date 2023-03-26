@@ -3,8 +3,8 @@ import * as path from "path";
 import crypto from "crypto";
 
 // recursively collect image files
-async function collectImageFiles(directory: string): Promise<string[]> {
-  let files: string[] = [];
+async function collectImageFiles(directory) {
+  let files = [];
   const items = fs.readdirSync(directory);
 
   for (const item of items) {
@@ -24,7 +24,7 @@ async function collectImageFiles(directory: string): Promise<string[]> {
 }
 
 // check if a file is an image file
-function isImage(file: string): boolean {
+function isImage(file) {
   const imageExtensions = [".jpg", ".jpeg", ".png", ".gif", ".svg", ".webp"];
   const ext = path.extname(file).toLowerCase();
 
@@ -32,7 +32,7 @@ function isImage(file: string): boolean {
 }
 
 // calculate SHA256 hash of a file
-function getFileHash(file: string): Promise<string> {
+function getFileHash(file) {
   return new Promise((resolve, reject) => {
     const hash = crypto.createHash("sha256");
     const stream = fs.createReadStream(file);
@@ -45,7 +45,7 @@ function getFileHash(file: string): Promise<string> {
 
 
 
-export async function indexImages(directory: string) {
+export async function indexImages(directory) {
     // recursively collect image files
     const files = await collectImageFiles(directory);
   
@@ -66,7 +66,12 @@ export async function indexImages(directory: string) {
     );
   
     // save metadata to file
-    const metadataDict = JSON.parse(fs.readFileSync("image-metadata.json").toString());
+    let metadataDict = {};
+    try {
+      metadataDict = JSON.parse(fs.readFileSync("image-metadata.json").toString());
+    } catch (err) {
+      // ignore error if file does not exist
+    }
     for (const { hash, ...rest } of imageMetadata) {
       metadataDict[hash] = rest;
     }

@@ -22,3 +22,4 @@ pnpm-debug.log*
 
 # app specific
 cache/
+image-metadata.json
