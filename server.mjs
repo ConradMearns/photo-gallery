@@ -139,12 +139,10 @@ app.get("/image/:hash", async (req, res) => {
   }
 });
 
-export function startServer(with_ui) {
-  if (with_ui == "true") {
-    console.log("Starting Astro");
-    app.use(express.static("dist/client/"));
-    app.use(ssrHandler);
-  }
+export function startServer() {
+  console.log("Starting Astro");
+  app.use(express.static("dist/client/"));
+  app.use(ssrHandler);
 
   app.listen(port, () => {
     console.log(`Server listening on port ${port}`);

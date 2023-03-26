@@ -17,11 +17,11 @@ program
   });
 
 program
-  .command("serve <with_ui>")
+  .command("serve")
   .description("Start the Express app")
-  .action(async (with_ui) => {
+  .action(() => {
     console.log("Starting server...");
-    startServer(with_ui);
+    startServer();
   });
 
 program.parse(process.argv);
