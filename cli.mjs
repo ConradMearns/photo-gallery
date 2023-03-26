@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// import { startServer } from "./server.mjs";
+import { startServer } from "./server.mjs";
 import { Command } from "commander";
 import { indexImages } from "./indexer.mjs";
 
@@ -16,12 +16,12 @@ program
     await indexImages(directory);
   });
 
-// program
-//   .command("serve")
-//   .description("Start the Express app")
-//   .action(() => {
-//     console.log("Starting server...");
-//     startServer();
-//   });
+program
+  .command("serve <with_ui>")
+  .description("Start the Express app")
+  .action(async (with_ui) => {
+    console.log("Starting server...");
+    startServer(with_ui);
+  });
 
 program.parse(process.argv);

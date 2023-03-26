@@ -1,14 +1,21 @@
 <script>
-  // import { Image } from "svelte-lazy-loader";
   import { onMount } from "svelte";
+
+  let domain = "127.0.0.1";
+  let port = 3001;
+  let url = `${domain}:${port}`;
 
   let all_images = [];
 
   async function fetchImages() {
-    const response = await fetch("http://192.168.1.15:3001/images");
+    const response = await fetch(`http://${url}/images`);
     if (response.ok) {
       all_images = await response.json();
     }
+  }
+
+  function updateImage(event, image) {
+    event.target.src = `http://${url}${image.imageUrl}?height=200`;
   }
 
   onMount(fetchImages);
@@ -17,44 +24,37 @@
 <ul>
   {#each all_images as image}
     <li>
-      <a href={`http://192.168.1.15:3001${image.imageUrl}`}>
-        <img
-          src={`http://192.168.1.15:3001${image.imageUrl}?height=200`}
-          alt={image.path}
-          height="200"
-        />
+      <a href={`http://${url}${image.imageUrl}`}>
+        <div style="height: 200px;">
+          <img
+            src={`http://${url}${image.imageUrl}?height=30&quality=1&cache=false`}
+            alt={image.path}
+            height="200"
+            loading="lazy"
+            on:load={(event) => {
+              updateImage(event, image);
+            }}
+          />
+        </div>
       </a>
     </li>
   {/each}
 </ul>
 
-
-
-
-
-
-
 <style>
-    ul {
-      display: flex;
-      flex-wrap: wrap;
-      list-style: none;
-      padding: 0;
-      margin: 0;
-    }
-  
-    li {
-      /* flex-basis: calc(33.33% - 1rem); */
-      /* margin: 0.5rem; */
-      margin: 0;
-    }
-  
-    a {
-      display: block;
-    }
-  
-    img {
-      width: 100%;
-      height: auto;
-    }
-  </style>
+  ul {
+    display: flex;
+    flex-wrap: wrap;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  li {
+    margin: 0;
+  }
+
+  a {
+    display: block;
+  }
+</style>

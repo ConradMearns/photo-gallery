@@ -1,6 +1,7 @@
 import * as fs from "fs";
 import * as path from "path";
 import crypto from "crypto";
+import sharp from "sharp";
 
 // recursively collect image files
 async function collectImageFiles(directory) {
@@ -23,9 +24,17 @@ async function collectImageFiles(directory) {
   return files;
 }
 
+function rgbToHex({ r, g, b }) {
+  return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
+}
+
 async function getDominantColor(file) {
-  const color = await dominantColor(file);
-  return { red: color[0], green: color[1], blue: color[2] };
+  const metadata = await sharp(file).metadata();
+  const { dominant } = await sharp(file)
+    .resize(Math.ceil(metadata.width / 10), Math.ceil(metadata.height / 10))
+    .stats({ channels: ['red', 'green', 'blue'] });
+
+  return rgbToHex(dominant);
 }
 
 // check if a file is an image file
@@ -65,15 +74,16 @@ export async function indexImages(directory) {
         const createdAt = fileStat.birthtime;
         const size = await getImageSize(file);
         const dominantColor = await getDominantColor(file);
+        console.log(dominantColor)
   
         return {
+          hash,
           path: file,
           size: fileStat.size,
           createdAt,
-          hash,
           width: size.width,
           height: size.height,
-          dominant_color: dominantColor,
+          color: dominantColor,
         };
       })
     );

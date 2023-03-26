@@ -3,22 +3,16 @@ import path from "path";
 import * as fs from "fs";
 import cors from "cors";
 import sharp from "sharp";
+// import { handler as ssrHandler } from "./dist/server/entry.mjs";
 
 const app = express();
 const port = process.env.PORT || 3001;
-
 app.use(
   cors({
-    origin: "http://192.168.1.15:3000",
+    origin: "*",
   })
 );
-
-import { handler as ssrHandler } from "./dist/server/entry.mjs";
-app.use(express.static("dist/client/"));
-app.use(ssrHandler);
-
 const CACHE_DIR = path.join(".", "cache");
-
 if (!fs.existsSync(CACHE_DIR)) {
   fs.mkdirSync(CACHE_DIR);
 }
@@ -60,7 +54,7 @@ app.get("/images", (req, res) => {
 app.get("/image/:hash", async (req, res) => {
   try {
     const { hash } = req.params;
-    const { width, height, quality } = req.query;
+    const { width, height, quality, cache = true } = req.query;
 
     const imageInfo = imageMetadata[hash];
 
@@ -71,9 +65,9 @@ app.get("/image/:hash", async (req, res) => {
     const cacheKey = `${hash}_${width || ""}_${height || ""}_${quality || ""}`;
 
     const cachedImage = path.join(CACHE_DIR, cacheKey);
-    if (fs.existsSync(cachedImage)) {
+    if (cache == true && fs.existsSync(cachedImage)) {
       const image = fs.readFileSync(cachedImage);
-      res.writeHead(200, { "Content-Type": "image/jpeg" });
+      res.writeHead(200, { "Content-Type": "image/webp" });
       res.end(image);
       // console.log('cache hit')
       return;
@@ -107,25 +101,52 @@ app.get("/image/:hash", async (req, res) => {
 
     if (parsedWidth !== null || parsedHeight !== null) {
       let transform = sharp(image);
-      transform = transform.resize(parsedWidth, parsedHeight).withMetadata();
+
+      // Rotate the image based on its orientation
+      const metadata = await transform.metadata();
+      if (
+        metadata.orientation &&
+        metadata.orientation >= 5 &&
+        metadata.orientation <= 8
+      ) {
+        transform = transform.rotate();
+      }
+
       image = await transform
-        .jpeg({
+        // .withMetadata()
+        .resize(parsedWidth, parsedHeight)
+        // .jpeg({
+        //   quality: parsedQuality,
+        //   progressive: true,
+        //   chromaSubsampling: "4:4:4",
+        // })
+        .webp({
           quality: parsedQuality,
-          progressive: true,
-          chromaSubsampling: "4:4:4",
-        }) // compress the image as JPEG with quality 80%
+          alphaQuality: parsedQuality,
+          reducionEffort: 6,
+        })
         .toBuffer();
 
-      fs.writeFileSync(cachedImage, image);
+      if (cache) {
+        fs.writeFileSync(cachedImage, image);
+      }
     }
 
-    res.writeHead(200, { "Content-Type": "image/jpeg" });
+    res.writeHead(200, { "Content-Type": "image/webp" });
     res.end(image);
   } catch (error) {
-    console.log(error)
+    console.log(error);
   }
 });
 
-app.listen(port, () => {
-  console.log(`Server listening on port ${port}`);
-});
+export function startServer(with_ui) {
+  if (with_ui == "true") {
+    console.log("Starting Astro");
+    app.use(express.static("dist/client/"));
+    app.use(ssrHandler);
+  }
+
+  app.listen(port, () => {
+    console.log(`Server listening on port ${port}`);
+  });
+}
