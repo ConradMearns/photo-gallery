@@ -5,7 +5,7 @@
   let all_images = [];
 
   async function fetchImages() {
-    const response = await fetch("http://localhost:8080/images");
+    const response = await fetch("http://localhost:3001/images");
     if (response.ok) {
       all_images = await response.json();
     }
@@ -17,9 +17,9 @@
 <ul>
   {#each all_images as image}
     <li>
-      <a href={`http://localhost:8080${image.imageUrl}`}>
+      <a href={`http://localhost:3001${image.imageUrl}`}>
         <img
-          src={`http://localhost:8080${image.imageUrl}?height=200`}
+          src={`http://localhost:3001${image.imageUrl}?height=200`}
           alt={image.path}
           height="200"
         />
