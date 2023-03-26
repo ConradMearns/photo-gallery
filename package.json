@@ -4,12 +4,11 @@
   "version": "0.0.1",
   "scripts": {
     "dev": "astro dev",
-    "start": "astro dev",
+    "astrostart": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "ts": "ts-node ./dist/index.js",
-    "tsc": "tsc"
+    "start": "astro build && node server.mjs"
   },
   "dependencies": {
     "@astrojs/node": "^5.1.0",

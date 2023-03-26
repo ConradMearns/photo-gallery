@@ -12,9 +12,9 @@ app.use(cors({
   origin: 'http://localhost:3000',
 }));
 
-// import { handler as ssrHandler } from './dist/server/entry.mjs';
-// app.use(express.static('dist/client/'));
-// app.use(ssrHandler);
+import { handler as ssrHandler } from './dist/server/entry.mjs';
+app.use(express.static('dist/client/'));
+app.use(ssrHandler);
 
 const CACHE_DIR = path.join('.', "cache");
 
