@@ -29,8 +29,8 @@ function rgbToHex({ r, g, b }) {
 }
 
 async function getDominantColor(file) {
-  const metadata = await sharp(file).metadata();
   try {
+    const metadata = await sharp(file).metadata();
     const { dominant } = await sharp(file)
       .resize(Math.ceil(metadata.width / 10), Math.ceil(metadata.height / 10))
       .stats({ channels: ['red', 'green', 'blue'] });
