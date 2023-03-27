@@ -1,9 +1,9 @@
 <script>
   import { onMount } from "svelte";
-
-  let domain = "127.0.0.1";
+  
+  let domain = "";
   let port = 3001;
-  let url = `${domain}:${port}`;
+  $: url = `${domain}:${port}`;
 
   let all_images = [];
 
@@ -18,7 +18,12 @@
     event.target.src = `http://${url}${image.imageUrl}?height=200`;
   }
 
-  onMount(fetchImages);
+  onMount(() => {
+    domain = window.location.hostname
+    url = `${domain}:${port}`;
+
+    fetchImages()
+  });
 </script>
 
 <ul>
