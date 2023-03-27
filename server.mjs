@@ -3,7 +3,7 @@ import path from "path";
 import * as fs from "fs";
 import cors from "cors";
 import sharp from "sharp";
-import { handler as ssrHandler } from "./dist/server/entry.mjs";
+// import { handler as ssrHandler } from "./dist/server/entry.mjs";
 
 const app = express();
 const port = process.env.PORT || 3001;
@@ -69,7 +69,6 @@ app.get("/image/:hash", async (req, res) => {
       const image = fs.readFileSync(cachedImage);
       res.writeHead(200, { "Content-Type": "image/webp" });
       res.end(image);
-      // console.log('cache hit')
       return;
     }
 
@@ -142,8 +141,8 @@ app.get("/image/:hash", async (req, res) => {
 export function startServer() {
   console.log("Starting Astro");
 }
-app.use(express.static("dist/client/"));
-app.use(ssrHandler);
+// app.use(express.static("dist/client/"));
+// app.use(ssrHandler);
 
 app.listen(port, () => {
   console.log(`Server listening on port ${port}`);
